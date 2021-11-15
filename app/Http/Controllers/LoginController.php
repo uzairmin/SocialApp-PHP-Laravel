@@ -31,7 +31,7 @@ class LoginController extends Controller
             DB::table('users')->where('email', $email)->where('password',$pass)->update(['status'=>'1']);    
         }
     }
-    function checkLogged($email,$token)
+    public function checkLogged($email,$token)
     {
         $data = DB::table('users')->where('email',$email)->where('remember_token',$token)->get();
         if(count($data) > 0)
@@ -59,15 +59,31 @@ class LoginController extends Controller
     {
         $email = $request->email;
         $token = $request->token;
+        $oldpassword = Hash::make($request->oldpassword);
         $newpassword = Hash::make($request->newpassword);
         $check = self::checkLogged($email,$token);
         if($check == true)
         {
-            DB::table('users')->where('email', $email)->where('remember_token',$token)->update(['password'=>$newpassword]);
-        }
-        else
-        {
-            echo "Wrong Email or token...";
+            $dbpass = DB::table('users')->where('email',$email)->where('password',$oldpassword)->get();
+            if(count($dbpass) > 0)
+            {
+                if(Hash::check($newpassword,$oldpassword))
+                {
+                  return "Old Password"; 
+                }
+                else
+                {
+                    $pass = $dbpass[0]->password;
+                    if (Hash::check($newpassword, $pass)) 
+                    {
+                        DB::table('users')->where('email', $email)->where('remember_token',$token)->update(['password'=>$newpassword]);    
+                    }
+                }
+            }
+            else
+            {
+                echo "Wrong Email or token...";
+            }
         }
     }
     function updateGender(Request $request)
@@ -85,7 +101,7 @@ class LoginController extends Controller
             echo "Wrong Email or token...";
         }
     }
-    function logingin(Request $request)
+    function loggingIn(Request $request)
     {
         $email = $request->email;
         $password = $request->password;

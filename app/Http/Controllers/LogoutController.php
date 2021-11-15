@@ -16,7 +16,7 @@ class LogoutController extends Controller
         }
         return false;
     }
-    function loggingout(Request $request)
+    function loggingOut(Request $request)
     {
         $email = $request->email;
         $token = $request->token;
@@ -25,9 +25,6 @@ class LogoutController extends Controller
         {
             echo"Logged Out";
         }
-        else
-        {
-            echo"///";
-        }
+        else{}
     }
 }

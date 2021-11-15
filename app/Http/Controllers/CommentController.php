@@ -18,7 +18,7 @@ class CommentController extends Controller
     }
     function commenting(Request $request)
     {
-        $user_id=0;
+        $userId = 0;
         $email = $request->email;
         $token = $request->token;
         $check = self::checkLogged($email,$token);
@@ -27,14 +27,69 @@ class CommentController extends Controller
             $users = DB::table('users')->where('email',$email)->get();
             foreach ($users as $user) 
             {
-                $user_id = $user->id;
+                $userId = $user->id;    
             }
         }
         $comment = new Comment();
         $comment->comment = $request->comment;
         $comment->file = $request->file('file')->store('comment');
-        $comment->user_id = $user_id;
-        $comment->post_id = $request->post_id;
+        $comment->post_id = $request->postId;
+        $comment->user_id = $userId;
         $comment->save();
+    }
+    function updateFile(Request $request)
+    {
+        $id;
+        $email = $request->email;
+        $tokens = $request->token;
+        $file = $request->file('file')->store('comment');
+        $postId = $request->postId;
+        $commentId = $request->commentId;
+        $check = self::checkLogged($email,$tokens);
+        if($check == true)
+        {
+            $users = DB::table('users')->where('email',$email)->get();
+            foreach ($users as $user) 
+            {
+                $id = $user->id;
+            }
+            DB::table('comments')->where('user_id',$id)->where('post_id',$postId)->where('id',$commentId)->update(['file'=>$file]);
+       }   
+    }
+    function updateComment(Request $request)
+    {
+        $id;
+        $email = $request->email;
+        $tokens = $request->token;
+        $comment = $request->comment;
+        $postId = $request->postId;
+        $commentId = $request->commentId;
+        $check = self::checkLogged($email,$tokens);
+        if($check == true)
+        {
+            $users = DB::table('users')->where('email',$email)->get();
+            foreach ($users as $user) 
+            {
+                $id = $user->id;
+            }
+            DB::table('comments')->where('user_id',$id)->where('post_id',$postId)->where('id',$commentId)->update(['comment'=>$comment]);
+       }   
+    }
+    function deleteComment(Request $request)
+    {
+        $id;
+        $email = $request->email;
+        $tokens = $request->token;
+        $commentId = $request->commentId;
+        $check = self::checkLogged($email,$tokens);
+        if($check == true)
+        {
+            $users = DB::table('users')->where('email',$email)->get();
+            foreach ($users as $user) 
+            {
+                $id = $user->id;
+            }
+            DB::table('comments')->where('id',$commentId)->delete();
+       }   
     }
 }
