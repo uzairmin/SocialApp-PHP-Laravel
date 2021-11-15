@@ -8,6 +8,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FriendController;
+use App\Http\Controllers\ShowController;
 use App\Http\Controllers\ConfirmationController;
 
 /*
@@ -34,6 +35,10 @@ Route::group(['middleware' => "tokenAuth"], function()
     Route::post('/new_password',[LoginController::class,'updatePassword']);
     Route::post('/update_gender',[LoginController::class,'updateGender']);
     Route::post('/post',[PostController::class,'posting']);
+    Route::post('/show_friends',[ShowController::class,'showFriends']);
+    Route::post('/show_user',[ShowController::class,'showUser']);
+    Route::post('/show_post',[ShowController::class,'showPost']);
+    Route::post('/show_comments',[ShowController::class,'showComments']);
     Route::post('/delete_post',[PostController::class,'deletePost']);
     Route::post('/update_post_file',[PostController::class,'updateFile']);
     Route::post('/update_post_access',[PostController::class,'updateAccess']);
@@ -44,4 +49,5 @@ Route::group(['middleware' => "tokenAuth"], function()
     Route::post('/friend',[FriendController::class,'addFriend']);
     Route::post('/user_deactivate',[SignupController::class,'deactivate']);
     Route::post('/logout',[LogoutController::class,'loggingOut']);
+    Route::post('/show_post',[ShowController::class,'showPost']);
 });

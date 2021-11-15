@@ -16,9 +16,47 @@ class CommentController extends Controller
         }
         return false;
     }
+    function checkFriends($userId,$postId)
+    {
+        $user = null;
+        $data = DB::table('posts')->where('id',$postId)->get();
+        foreach ($data as $d) 
+        {
+           $user = $d->user_id;   
+        }
+        $data1 = DB::table('friends')->where('user1_id',$userId)->where('user2_id',$user)->get();
+        if(count($data1) > 0)
+        {
+            return true;
+        }
+        $data2 = DB::table('friends')->where('user2_id',$userId)->where('user1_id',$user)->get();
+        if(count($data1) > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    function checkAccess($postId)
+    {
+        $access = null;
+        $users = DB::table('posts')->where('id',$postId)->get();
+        foreach ($users as $user) 
+        {
+           $access = $user->access;    
+        }
+        if($access == "private")
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     function commenting(Request $request)
     {
         $userId = 0;
+        $ch;
         $email = $request->email;
         $token = $request->token;
         $check = self::checkLogged($email,$token);
@@ -30,12 +68,30 @@ class CommentController extends Controller
                 $userId = $user->id;    
             }
         }
-        $comment = new Comment();
-        $comment->comment = $request->comment;
-        $comment->file = $request->file('file')->store('comment');
-        $comment->post_id = $request->postId;
-        $comment->user_id = $userId;
-        $comment->save();
+        $postId = $request->post_id;
+        $flag = self::checkAccess($postId);
+        if($flag = true)
+        {
+            $ch = self::checkFriends($userId,$postId);
+            if($ch == true)
+            {
+                $comment = new Comment();
+                $comment->comment = $request->comment;
+                $comment->file = $request->file('file')->store('comment');
+                $comment->post_id = $postId;
+                $comment->user_id = $userId;
+                $comment->save();
+            }
+        }
+        else
+        {
+            $comment = new Comment();
+                $comment->comment = $request->comment;
+                $comment->file = $request->file('file')->store('comment');
+                $comment->post_id = $postId;
+                $comment->user_id = $userId;
+                $comment->save();
+        }
     }
     function updateFile(Request $request)
     {
