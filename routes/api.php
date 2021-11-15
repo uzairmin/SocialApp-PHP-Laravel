@@ -42,5 +42,6 @@ Route::group(['middleware' => "tokenAuth"], function()
     Route::post('/update_comment_file',[CommentController::class,'updateFile']);
     Route::post('/update_comment_comment',[CommentController::class,'updateComment']);
     Route::post('/friend',[FriendController::class,'addFriend']);
+    Route::post('/user_deactivate',[SignupController::class,'deactivate']);
     Route::post('/logout',[LogoutController::class,'loggingOut']);
 });
