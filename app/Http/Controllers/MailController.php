@@ -14,6 +14,6 @@ class MailController extends Controller
         $details = ['title'=>'Hello Mailer',
                     'body'=>'This mail For testing'];
                     Mail::to('malikabdullah4300@gmail.com')->send(new TestMail($details));
-                    return 'Mail Sent...';
+                    return response()->json(['Message'=>"Mail sent"]);
     }
 }

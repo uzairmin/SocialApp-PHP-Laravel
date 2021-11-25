@@ -64,5 +64,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'tokenAuth' => \App\Http\Middleware\CustomAuth::class,
+        'friendAuth' => \App\Http\Middleware\FriendsAuth::class,
+        'postAuth' => \App\Http\Middleware\PostAuth::class,
+        'commentAuth' => \App\Http\Middleware\CommentAuth::class,
     ];
 }

@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use App\Mail\TestMail;
 
 class TestMail extends Mailable
 {
@@ -30,6 +31,6 @@ class TestMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Email Verification from META')->view('mail');
+        return $this->subject("Email Verification from META")->view('mail');
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Services\ConnectionDB;
+use App\Http\Requests\EmailValidation;
 
 class ShowController extends Controller
 {
@@ -17,6 +19,7 @@ class ShowController extends Controller
     }
     function showFriends(Request $request)
     {
+        $showFriend;
         $userId;
         $user;
         $email = $request->email;
@@ -35,48 +38,33 @@ class ShowController extends Controller
                 if($t1->user2_id == $userId)
                 {
                     $user = $t1->user1_id;
-                    $showFriends = DB::table('users')->where('id',$user)->get();
+                    $showFriend = DB::table('users')->select('name')->where('id',$user)->get();
                 }
                 elseif($t1->user1_id == $userId)
                 {
                     $user = $t1->user2_id;
-                    $showFriends = DB::table('users')->where('id',$user)->get();
+                    $showFriend = DB::table('users')->select('name')->where('id',$user)->get();
                 } 
-                foreach($showFriends as $sf)
-                {
-                    echo $sf->name;
-                    echo"<br>";
-                }
+                return response(['Your Friend is :'=>$showFriend]);
             }
         }
     }
-    function showUser(Request $request)
+    function showUser(EmailValidation $request)
     {
-        $userId;
-        $user;
         $email = $request->email;
         $token = $request->token;
         $check = self::checkLogged($email,$token);
         if($check == true)
         {
-            $data = DB::table('users')->where('email',$email)->where('remember_token',$token)->get();
-            foreach($data as $t)
-            {
-                $userId = $t->id;
-            }
-            $data = DB::table('users')->where('id',$userId)->get();
-            foreach($data as $t)
-            {
-                echo $t->name;
-                echo"<br>";
-                echo $t->email;
-                echo"<br>";
-                echo $t->gender;
-                echo"<br>";
-            }
+            $data = DB::table('users')->select(['name','email','gender'])->where(['email'=> $email ,'remember_token'=>$token])->get();
+            return response(['User Data :'=>$data]);
+        }
+        else
+        {
+            return response()->json(['Message'=>"Wrong Email or token"]);
         }
     }
-    function showPost(Request $request)
+    function showPost(EmailValidation $request)
     {
         $email = $request->email;
         $token = $request->token;
@@ -89,22 +77,13 @@ class ShowController extends Controller
             {
                 $userId = $t->id;
             }
-            $data1 = DB::table('posts')->where('user_id',$userId)->where('id',$postId)->get();
-            foreach($data1 as $t1)
-            {
-                echo $t1->file;
-                echo"<br>";
-                echo $t1->access;
-                echo"<br>";
-            }
-            $data2 = DB::table('comments')->where('user_id',$userId)->where('post_id',$postId)->get();
-            foreach($data2 as $t2)
-            {
-                echo $t2->comment;
-                echo"<br>";
-                echo $t2->file;
-                echo"<br>";
-            }
+            $data1 = DB::table('posts')->select(['file','access'])->where(['user_id'=>$userId,'id'=>$postId])->get();
+            $data2 = DB::table('comments')->select()->where(['user_id'=>$userId,'post_id'=>$postId])->get();
+            return response(['Post Data :'=>$data1,'Comments Data :'=>$data2]);
+        }
+        else
+        {
+            return response()->json(['Message'=>"Wrong Email or token"]);
         }
     }
     function showComments(Request $request)
@@ -121,14 +100,12 @@ class ShowController extends Controller
             {
                 $userId = $t->id;
             }
-            $data2 = DB::table('comments')->where('id',$commentId)->where('post_id',$postId)->get();
-            foreach($data2 as $t2)
-            {
-                echo $t2->comment;
-                echo"<br>";
-                echo $t2->file;
-                echo"<br>";
-            }
+            $data2 = DB::table('comments')->select('comment','file')->where(['id'=>$commentId,'post_id'=>$postId])->get();
+            return response(['Comments Data :'=>$data2]);
+        }
+        else
+        {
+            return response()->json(['Message'=>"Wrong Email or token"]);
         }
     }
 }

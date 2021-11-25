@@ -9,48 +9,75 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\TestMail;
 use App\Http\Requests\SignupValidation;
+use App\Providers\ResponseServiceProviders;
+use App\Jobs\MailJob;
 
 class SignupController extends Controller
 {
    
     function signingUp(SignupValidation $request)
     {
-        $token = rand(1000,1000000);
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->gender = $request->gender;
-        $user->active = 1;
-        $user->token = $token;
-        $user->save();
-        $details = ['title'=>'Verify to continue',
-                'body'=>'http://127.0.0.1:8000/api/confirmation/'.$request->email.'/'.$token
-            ];
-        Mail::to($request->email)->send(new TestMail($details));
-        return 'Mail Sent...';
+        try
+        {
+            $token = rand(1000,1000000);
+            $user = new User();
+            $user->name = $request->name;
+            $email = $request->email;
+            $user->email = $email;
+            $user->password = Hash::make($request->password);
+            $user->gender = $request->gender;
+            $user->active = 1;
+            $user->token = $token;
+            $user->save();
+            $details = ['title'=>'Verify to continue',
+                    'body'=>'http://127.0.0.1:8000/api/confirmation/'.$request->email.'/'.$token
+                ];
+                //$mail = new MailJob($email, $details);
+                dispatch(new MailJob($email, $details));
+            //Mail::to($request->email)->send(new TestMail($details));
+            return response()->json(['Message'=>"Mail Sent"]);  
+        }    
+        catch(\Exception $show_error)    
+        {        
+            return response()->json(['Error' => $show_error->getMessage()], 500);    
+        }
     }
     public function checkLogged($email,$token)
     {
-        $data = DB::table('users')->where('email',$email)->where('remember_token',$token)->get();
-        if(count($data) > 0)
+        try
         {
-            return true;
+            $data = DB::table('users')->where('email',$email)->where('remember_token',$token)->get();
+            if(count($data) > 0)
+            {
+                return true;
+            }
+            return false;
+        }    
+        catch(\Exception $show_error)    
+        {        
+            return response()->json(['Error' => $show_error->getMessage()], 500);    
         }
-        return false;
     }
-    function deactivate(Request $request)
+    function deactivate(EmailValidation $request)
     {
-        $email = $request->email;
-        $token = $request->token;
-        $check = self::checkLogged($email,$token);
-        if($check == true)
+        try
         {
-            DB::table('users')->where('email',$email)->where('remember_token',$token)->update(['active'=>null]);
-        }
-        else
-        {
-            echo "User is not authenticated";
+            $email = $request->email;
+            $token = $request->token;
+            $check = self::checkLogged($email,$token);
+            if($check == true)
+            {
+                DB::table('users')->where('email',$email)->where('remember_token',$token)->update(['active'=>null]);
+                return response()->json(['Message'=>"User deactivated"]);
+            }
+            else
+            {
+                return response()->json(['Message'=>"User is not authenticated"]);
+            }
+        }    
+        catch(\Exception $show_error)    
+        {        
+            return response()->json(['Error' => $show_error->getMessage()], 500);    
         }
     }
 }

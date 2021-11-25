@@ -19,11 +19,10 @@ class customAuth
     public function handle(Request $request, Closure $next)
     {
         $token = $request->token; 
-        $check2 = DB::table('users')->where('remember_token',$token)->get();
-        $word = count($check2);
-        if($word > 0)
+        $data = DB::table('users')->where('remember_token',$token)->first();
+        if($data)
         {
-            return $next($request);
+            return $next($request->merge(['user_data'=>$data]));
         }
         else
         {
