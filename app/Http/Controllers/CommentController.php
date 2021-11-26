@@ -109,7 +109,7 @@ class CommentController extends Controller
                     $comment->post_id = $postId;
                     $comment->user_id = $userId;
                     $comment->save();
-                    return response()->json(['Message'=>"Commented"]);
+                    return response()->success();
                 }
             }
             else
@@ -120,7 +120,7 @@ class CommentController extends Controller
                     $comment->post_id = $postId;
                     $comment->user_id = $userId;
                     $comment->save();
-                    return response()->json(['Message'=>"Commented"]);
+                    return response()->success();
             }
         }    
         catch(\Exception $show_error)    
@@ -148,7 +148,7 @@ class CommentController extends Controller
                     $id = $user->id;
                 }
                 DB::table('comments')->where('user_id',$id)->where('post_id',$postId)->where('id',$commentId)->update(['file'=>$file]);
-                return response()->json(['Message'=>"File Updated"]);
+                return response()->success();
             }   
         }    
         catch(\Exception $show_error)    
@@ -175,7 +175,7 @@ class CommentController extends Controller
                     $id = $user->id;
                 }
                 DB::table('comments')->where('user_id',$id)->where('post_id',$postId)->where('id',$commentId)->update(['comment'=>$comment]);
-                return response()->json(['Message'=>"Comment Updated"]);
+                return response()->success();
             }
         }    
         catch(\Exception $show_error)    
@@ -200,7 +200,7 @@ class CommentController extends Controller
                     $id = $user->id;
                 }
                 DB::table('comments')->where('id',$commentId)->delete();
-                return response()->json(['Message'=>"Comment Deleted"]);
+                return response()->success();
             }   
         }    
         catch(\Exception $show_error)    

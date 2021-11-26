@@ -46,7 +46,7 @@ class PostController extends Controller
                 $post->user_id = $id;
                 $post->access =$request->access;
                 $post->save();
-                return response()->json(['Message'=>"Posted"]);
+                return response()->success();
            } 
         }    
         catch(\Exception $show_error)    
@@ -73,7 +73,7 @@ class PostController extends Controller
                 }
                 $file = $request->file('file')->store('post');
                 DB::table('posts')->where('user_id',$id)->where('id',$postId)->update(['file'=>$file]);
-                return response()->json(['Message'=>"File updated"]);
+                return response()->success();
            }      
         }    
         catch(\Exception $show_error)    
@@ -100,7 +100,7 @@ class PostController extends Controller
                     $id = $user->id;
                 }
                 DB::table('posts')->where('user_id',$id)->where('id',$postId)->update(['access'=>$access]);
-                return response()->json(['Message'=>"Access updated"]);
+                return response()->success();
            }   
         }    
         catch(\Exception $show_error)    
@@ -129,7 +129,7 @@ class PostController extends Controller
                 {
                     DB::table('comments')->where('post_id',$postId)->delete();
                     DB::table('posts')->where('user_id',$id)->where('id',$postId)->delete();
-                    return response()->json(['Message'=>"Post deleted"]);
+                    return response()->success();
                 }
                 else
                 {
